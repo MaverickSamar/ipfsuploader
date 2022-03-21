@@ -1,11 +1,20 @@
 import React, { Component } from "react";
 import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import getWeb3 from "./getWeb3";
+import ipfs from "./ipfs.js"
 
 import "./App.css";
 
 class App extends Component {
-  state = { storageValue: 0, web3: null, accounts: null, contract: null };
+  // state = { storageValue: 0, web3: null, accounts: null, contract: null };
+  constructor(props){
+    super(props)
+    this.state = {
+      storageValue: 0, web3: null, accounts: null, contract: null, ipfsHash: '', buffer: null
+    }
+    this.captureFile = this.captureFile.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
+  }
 
   componentDidMount = async () => {
     try {
@@ -29,7 +38,7 @@ class App extends Component {
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
-        `Failed to load web3, accounts, or contract. Check console for details.`,
+        `Failed to load web3, accounts, or contract. Refresh and connect Metamask Account. You can install Metamask extension from Chrome Extension Store`,
       );
       console.error(error);
     }
@@ -48,23 +57,55 @@ class App extends Component {
     this.setState({ storageValue: response });
   };
 
+  captureFile(event){
+
+    console.log('capture file...');
+    event.preventDefault();
+    const file = event.target.files[0];
+    const reader = new window.FileReader();
+    reader.readAsArrayBuffer(file);
+    reader.onloadend = () => {
+      this.setState({ buffer: Buffer( reader.result )})
+      console.log('buffer', this.state.buffer)
+    }
+  }
+  onSubmit(event){
+    event.preventDefault();
+    console.log('fine until now');
+    ipfs.files.add(this.state.buffer, (error, result) => {
+      if(error) {
+        console.log("error occured " + error);
+        return
+      }
+      this.setState({ ipfsHash : result[0].hash })
+      console.log('ipfsHash', this.state.ipfsHash)
+    })
+  }
+
   render() {
     if (!this.state.web3) {
       return <div>Loading Web3, accounts, and contract...</div>;
     }
     return (
       <div className="App">
-        <h1>Good to Go!</h1>
-        <p>Your Truffle Box is installed and ready.</p>
-        <h2>Smart Contract Example</h2>
-        <p>
-          If your contracts compiled and migrated successfully, below will show
-          a stored value of 5 (by default).
-        </p>
-        <p>
-          Try changing the value stored on <strong>line 42</strong> of App.js.
-        </p>
-        <div>The stored value is: {this.state.storageValue}</div>
+        <nav className="navbar pure-menu pure-menu-horizontal">
+          <a href="/" className="pure-menu-heading pure-menu-link">IPFS Geospatial File Upload DApp</a>
+        </nav>
+        <main className="container">
+          <div className="pure-g">
+            <div className="pure-u-1-1">
+              <h1>Upload the file to IPFS Nodes</h1>
+              <p>This data will be stored on IPFS & The Ethereum Blockchain</p>
+              <img src={`https://ipfs.io/ipfs/${this.state.ipfsHash}`} alt="" />
+              <p>File IPFS Hash - {`${this.state.ipfsHash}`}</p>
+              <h2>Upload File</h2>
+              <form onSubmit={this.onSubmit}>
+                <input type="file" onChange={this.captureFile}/>
+                <input type="submit" />
+              </form>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
