@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import SimpleStorageContract from "./contracts/SimpleStorage.json";
 import getWeb3 from "./getWeb3";
-import ipfs from "./ipfs.js"
-
+import ipfs from "./ipfs.js";
+import chakra from './chakralogo.png';
 import "./App.css";
 
 class App extends Component {
@@ -58,7 +58,6 @@ class App extends Component {
   };
 
   captureFile(event){
-
     console.log('capture file...');
     event.preventDefault();
     const file = event.target.files[0];
@@ -74,13 +73,29 @@ class App extends Component {
     console.log('fine until now');
     ipfs.files.add(this.state.buffer, (error, result) => {
       if(error) {
-        console.log("error occured " + error);
+        console.log('error occured', error);
         return
       }
       this.setState({ ipfsHash : result[0].hash })
       console.log('ipfsHash', this.state.ipfsHash)
     })
   }
+  // downloadFile(event){
+  //   event.preventDefault();
+  //   var hash = document.getElementById('downloadFile').value;
+  //   var content = document.getElementById('fileread');
+  //   var result = `https://ipfs.io/ipfs/${this.state.ipfsHash}`.files;
+  //   const reader = new FileReader();
+
+  //   reader.addEventListener("load", () => {
+  //   // this will then display a text file
+  //     content.innerText = reader.result;
+  //     }, false);
+
+  //   if (result) {
+  //     reader.readAsText(result);
+  //   }
+  // };
 
   render() {
     if (!this.state.web3) {
@@ -89,7 +104,8 @@ class App extends Component {
     return (
       <div className="App">
         <nav className="navbar pure-menu pure-menu-horizontal">
-          <a href="/" className="pure-menu-heading pure-menu-link">IPFS Geospatial File Upload DApp</a>
+          <img src={chakra} alt="" className="logo"/>
+          <a href="/" className="pure-menu-heading pure-menu-link">Vishnu</a>
         </nav>
         <main className="container">
           <div className="pure-g">
@@ -97,13 +113,21 @@ class App extends Component {
               <h1>Upload the file to IPFS Nodes</h1>
               <p>This data will be stored on IPFS & The Ethereum Blockchain</p>
               <img src={`https://ipfs.io/ipfs/${this.state.ipfsHash}`} alt="" />
-              <p>File IPFS Hash - {`${this.state.ipfsHash}`}</p>
               <h2>Upload File</h2>
               <form onSubmit={this.onSubmit}>
                 <input type="file" onChange={this.captureFile}/>
-                <input type="submit" />
+                <input type="submit" className="but"/>
               </form>
+              <p className="hash">File IPFS Hash {`${this.state.ipfsHash}`}</p>
             </div>
+            <div className="download">
+              <form >
+                <input type="text" id="downloadFile" placeholder="Enter IPFS Hash"/>
+                <button onClick={this.downloadFile} className="but">Download</button>
+              </form>
+              <p id="fileread"></p>
+            </div>
+            
           </div>
         </main>
       </div>
