@@ -8,17 +8,17 @@ Clone this github repository
 
 To run the frontend - 
 
-cd client
-npm run start
+-> cd client
+-> npm run start
 
 To run the local Blockchain use Ganche - https://trufflesuite.com/ganache/
 Install and run Ganche with quickstart.
 
 Now in a new terminal window -
 
-truffle compile
-truffle --reset migrate
-truffle develop
+-> truffle compile
+-> truffle --reset migrate
+-> truffle develop
 
 Now connect frontend on your browser using a wallet like Metamask.
 
